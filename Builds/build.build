@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="Build" default="run" basedir=".."
+         xmlns="http://nant.sf.net/release/0.92/nant.xsd">
+  
+  <loadtasks assembly="C:\Program Files\CSG\DevTools\Lib\NAnt\Dev.NAnt.Tasks.dll" />
+  <target name="run">
+    <restorepackages target="Source\EasyNetQ.sln" />
+    <msbuild project="Build\EasyNetQ.proj" target="Version;Build;Merge;Package;PackageManagementClient;PackageDiWindsor" />
+    
+    <copy todir="Artifacts/Publish/csg.oss.nuget">
+      <fileset basedir="Package\EasyNetQ">
+        <include name="*.nupkg" />
+      </fileset>
+    </copy>
+    <copy todir="Artifacts/Publish/csg.oss.nuget">
+      <fileset basedir="Package\EasyNetQ.DI.Windsor">
+        <include name="*.nupkg" />
+      </fileset>
+    </copy>
+    <copy todir="Artifacts/Publish/csg.oss.nuget">
+      <fileset basedir="Package\EasyNetQ.Management.Client">
+        <include name="*.nupkg" />
+      </fileset>
+    </copy>
+    
+    <nugetpush nupkgdir="Artifacts\Publish\csg.oss.nuget" apikey="${csg.oss.nuget.apikey}" source="${csg.oss.nuget}" />
+  </target>
+</project>

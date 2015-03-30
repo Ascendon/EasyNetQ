@@ -231,6 +231,6 @@
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-    <Exec Command="..\..\Tools\ILRepack\ILRepack.exe /internalize /targetplatform:v4 /out:$(OutputPath)\EasyNetQ.dll $(OutputPath)\EasyNetQ.dll $(OutputPath)\Newtonsoft.Json.dll" />
+    <Exec Command="..\..\Tools\ILRepack\ILRepack.exe /internalize /targetplatform:v4 /keyfile:..\EasyNetQ.snk /out:$(OutputPath)\EasyNetQ.dll $(OutputPath)\EasyNetQ.dll $(OutputPath)\Newtonsoft.Json.dll" />
   </Target>
 </Project>

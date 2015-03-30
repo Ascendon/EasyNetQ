@@ -34,6 +34,12 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\EasyNetQ.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\EasyNetQ.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -215,6 +221,9 @@
     <Compile Include="MessageVersioning\VersionedMessageSerializationStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\EasyNetQ.snk">
+      <Link>EasyNetQ.snk</Link>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -222,6 +231,6 @@
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-    <Exec Command="..\..\Tools\ILRepack\ILRepack.exe /internalize /targetplatform:v4 /out:$(OutputPath)\EasyNetQ.dll $(OutputPath)\EasyNetQ.dll $(OutputPath)\Newtonsoft.Json.dll" />
+    <Exec Command="..\..\Tools\ILRepack\ILRepack.exe /internalize /targetplatform:v4 /keyfile:..\EasyNetQ.snk /out:$(OutputPath)\EasyNetQ.dll $(OutputPath)\EasyNetQ.dll $(OutputPath)\Newtonsoft.Json.dll" />
   </Target>
 </Project>

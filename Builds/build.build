@@ -3,9 +3,17 @@
          xmlns="http://nant.sf.net/release/0.92/nant.xsd">
   
   <loadtasks assembly="C:\Program Files\CSG\DevTools\Lib\NAnt\Dev.NAnt.Tasks.dll" />
+  
+  <initproperty name="version" default="${version::from-tag()}" />
+  <fail if="${version == ''}" message="Either tag the commit or explicitly specify the version" />
+  
   <target name="run">
     <restorepackages target="Source\EasyNetQ.sln" />
-    <msbuild project="Build\EasyNetQ.proj" target="Version;Build;Merge;Package;PackageManagementClient;PackageDiWindsor" />
+    <msbuild project="Build\EasyNetQ.proj" target="Version;Build;Merge;Package;PackageManagementClient;PackageDiWindsor">
+      <properties>
+        <property name="Version" value="${version}" />
+      </properties>
+    </msbuild>
     
     <copy todir="Artifacts/Publish/csg.oss.nuget">
       <fileset basedir="Package\EasyNetQ">
@@ -22,7 +30,5 @@
         <include name="*.nupkg" />
       </fileset>
     </copy>
-    
-    <nugetpush nupkgdir="Artifacts\Publish\csg.oss.nuget" apikey="${csg.oss.nuget.apikey}" source="${csg.oss.nuget}" />
   </target>
 </project>

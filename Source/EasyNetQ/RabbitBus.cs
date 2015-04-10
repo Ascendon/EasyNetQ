@@ -4,6 +4,7 @@ using EasyNetQ.Consumer;
 using EasyNetQ.FluentConfiguration;
 using EasyNetQ.Producer;
 using EasyNetQ.Topology;
+using System.Linq;
 
 namespace EasyNetQ
 {
@@ -71,7 +72,13 @@ namespace EasyNetQ
             var messageType = typeof (T);
             return publishExchangeDeclareStrategy.DeclareExchangeAsync(advancedBus, messageType, ExchangeType.Topic).Then(exchange =>
                 {
-                    var easyNetQMessage = new Message<T>(message) { Properties = { DeliveryMode = (byte)(messageDeliveryModeStrategy.IsPersistent(messageType) ? 2 : 1) } };
+                    var easyNetQMessage = new Message<T>(message)
+                    {
+                        Properties =
+                        {
+                            DeliveryMode = messageDeliveryModeStrategy.GetDeliveryMode(messageType)
+                        }
+                    };
                     return advancedBus.PublishAsync(exchange, topic, false, false, easyNetQMessage); 
                 });
         }
@@ -124,7 +131,7 @@ namespace EasyNetQ
             var queue = advancedBus.QueueDeclare(queueName, autoDelete: configuration.AutoDelete, expires: configuration.Expires);
             var exchange = advancedBus.ExchangeDeclare(exchangeName, ExchangeType.Topic);
 
-            foreach (var topic in configuration.Topics.AtLeastOneWithDefault("#"))
+            foreach (var topic in configuration.Topics.DefaultIfEmpty("#"))
             {
                 advancedBus.Bind(exchange, queue, topic);
             }

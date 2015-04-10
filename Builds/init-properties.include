@@ -2,6 +2,6 @@
 <project name="Initialize Properties" basedir=".." xmlns="http://nant.sf.net/release/0.92/nant.xsd">
 
   <!-- The default branch is uploaded after a build, while feature/bugfix branches are not. -->
-  <property name="build.branch.default" value="csg/stable" />
+  <property name="build.branch.default" value="csg/release/0.48.0-beta" />
   
 </project>

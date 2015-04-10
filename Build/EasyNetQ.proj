@@ -2,8 +2,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Default">
 
     <PropertyGroup>
-        <BuildNumber>$(BUILD_NUMBER)</BuildNumber>
-        <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
         <BaseDir>$(MSBuildProjectDirectory)\..</BaseDir>
         <OutputDir>$(BaseDir)\bin</OutputDir>
         <Tools>$(BaseDir)\Tools</Tools>
@@ -21,8 +19,8 @@
 
     <Target Name="Version">
         <FileUpdate Files="$(Source)\Version.cs"
-            Regex="AssemblyVersion\(&quot;(\d+)\.(\d+)\.(\d+)\.(\d+)&quot;\)"
-            ReplacementText="AssemblyVersion(&quot;$1.$2.$3.$(BuildNumber)&quot;)" />
+            Regex="AssemblyVersion\(&quot;(\d+\.\d+\.\d+\.\d+)&quot;\)"
+            ReplacementText="AssemblyVersion(&quot;$(Version)&quot;)" />
     </Target>
 
     <ItemGroup>

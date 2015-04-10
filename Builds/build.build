@@ -30,7 +30,5 @@
         <include name="*.nupkg" />
       </fileset>
     </copy>
-    
-    <nugetpush nupkgdir="Artifacts\Publish\csg.oss.nuget" apikey="${csg.oss.nuget.apikey}" source="${csg.oss.nuget}" />
   </target>
 </project>

@@ -4,9 +4,10 @@
   
   <loadtasks assembly="C:\Program Files\CSG\DevTools\Lib\NAnt\Dev.NAnt.Tasks.dll" />
   
-  <!-- hard code the version for this one off build of a PR -->
-  <initproperty name="version.assembly" default="0.48.0.0" />
-  <initproperty name="version.package" default="0.48.0-beta" />
+  <initproperty name="version.assembly" default="${version::assembly-from-tag()}" />
+  <initproperty name="version.package" default="${version::package-from-tag()}" />
+  <fail if="${version.package == '' or version.assembly == ''}" 
+        message="Either tag the commit or explicitly specify version.package and version.assembly from the command line" />
   
   <target name="run">
     <restorepackages target="Source\EasyNetQ.sln" />

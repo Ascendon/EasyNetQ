@@ -2,6 +2,7 @@
 using EasyNetQ.Interception;
 using EasyNetQ.Loggers;
 using EasyNetQ.Producer;
+using EasyNetQ.Scheduling;
 
 namespace EasyNetQ
 {
@@ -19,7 +20,7 @@ namespace EasyNetQ
             // default service registration
             container
                 .Register(_ => container)       
-                .Register<IEasyNetQLogger, ConsoleLogger>()
+                .Register<IEasyNetQLogger, NullLogger>()
                 .Register<ISerializer, JsonSerializer>()
                 .Register<IConventions, Conventions>()
                 .Register<IEventBus, EventBus>()
@@ -44,7 +45,7 @@ namespace EasyNetQ
                 .Register<IAdvancedBus, RabbitAdvancedBus>()
                 .Register<IRpc, Rpc>()
                 .Register<ISendReceive, SendReceive>()
-                .Register<IScheduler, Scheduler>()
+                .Register<IScheduler, ExternalScheduler>()
                 .Register<IBus, RabbitBus>();
         }
          

@@ -11,7 +11,7 @@
   
   <target name="run">
     <restorepackages target="Source\EasyNetQ.sln" />
-    <msbuild project="Build\EasyNetQ.proj" target="Version;Build;Merge;Package;PackageManagementClient;PackageDiWindsor">
+    <msbuild project="Build\EasyNetQ.proj" target="Version;Build;Merge;Package;PackageDiWindsor">
       <properties>
         <property name="Version" value="${version.assembly}" />
         <property name="PackageVersion" value="${version.package}" />

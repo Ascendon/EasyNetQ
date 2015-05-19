@@ -28,10 +28,5 @@
         <include name="*.nupkg" />
       </fileset>
     </copy>
-    <copy todir="Artifacts/Publish/csg.oss.nuget">
-      <fileset basedir="Package\EasyNetQ.Management.Client">
-        <include name="*.nupkg" />
-      </fileset>
-    </copy>
   </target>
 </project>

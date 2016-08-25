@@ -85,10 +85,8 @@ namespace EasyNetQ.Producer
             var timer = new Timer(state =>
                 {
                     ((Timer) state).Dispose();
-                    tcs.TrySetException(new TimeoutException(
-                        string.Format("Request timed out. CorrelationId: {0}", correlationId.ToString())));
+                    tcs.TrySetException(new TimeoutException(string.Format("Request timed out. CorrelationId: {0}", correlationId.ToString())));
                 });
-
 
             var requestType = typeof (TRequest);
             timer.Change(TimeSpan.FromSeconds(timeoutStrategy.GetTimeoutSeconds(requestType)), disablePeriodicSignaling);
@@ -138,8 +136,7 @@ namespace EasyNetQ.Producer
                 OnFailure = () =>
                 {
                     timer.Dispose();
-                    tcs.TrySetException(new EasyNetQException(
-                        "Connection lost while request was in-flight. CorrelationId: {0}", correlationId.ToString()));
+                    tcs.TrySetException(new EasyNetQException("Connection lost while request was in-flight. CorrelationId: {0}", correlationId.ToString()));
                 }
             });
         }
@@ -155,12 +152,17 @@ namespace EasyNetQ.Producer
             {
                 if (responseQueues.TryGetValue(rpcKey, out queueName))
                     return queueName;
+                
                 var queue = advancedBus.QueueDeclare(
                             conventions.RpcReturnQueueNamingConvention(),
                             passive: false,
                             durable: false,
                             exclusive: true,
                             autoDelete: true);
+
+                var exchange = DeclareRpcExchange();
+
+                advancedBus.Bind(exchange, queue, queue.Name);
 
                 advancedBus.Consume<TResponse>(queue, (message, messageReceivedInfo) => Task.Factory.StartNew(() =>
                     {
@@ -203,7 +205,7 @@ namespace EasyNetQ.Producer
                 }
             };
 
-            advancedBus.Publish(exchange, routingKey, false, false, requestMessage);
+            advancedBus.Publish(exchange, routingKey, false, requestMessage);
         }
 
         public virtual IDisposable Respond<TRequest, TResponse>(Func<TRequest, Task<TResponse>> responder)
@@ -213,7 +215,7 @@ namespace EasyNetQ.Producer
             return Respond(responder, c => { });
         }
 
-        public IDisposable Respond<TRequest, TResponse>(Func<TRequest, Task<TResponse>> responder, Action<IResponderConfiguration> configure) where TRequest : class where TResponse : class
+        public virtual IDisposable Respond<TRequest, TResponse>(Func<TRequest, Task<TResponse>> responder, Action<IResponderConfiguration> configure) where TRequest : class where TResponse : class
         {
             Preconditions.CheckNotNull(responder, "responder");
             Preconditions.CheckNotNull(configure, "configure");
@@ -281,7 +283,9 @@ namespace EasyNetQ.Producer
                 }
             };
 
-            advancedBus.Publish(Exchange.GetDefault(), requestMessage.Properties.ReplyTo, false, false, responseMessage);
+            var exchange = DeclareRpcExchange();
+
+            advancedBus.Publish(exchange, requestMessage.Properties.ReplyTo, false, responseMessage);
         }
 
         protected virtual void OnResponderFailure<TRequest, TResponse>(IMessage<TRequest> requestMessage, string exceptionMessage, Exception exception)
@@ -295,7 +299,14 @@ namespace EasyNetQ.Producer
             responseMessage.Properties.CorrelationId = requestMessage.Properties.CorrelationId;
             responseMessage.Properties.DeliveryMode = MessageDeliveryMode.NonPersistent;
 
-            advancedBus.Publish(Exchange.GetDefault(), requestMessage.Properties.ReplyTo, false, false, responseMessage);
+            var exchange = DeclareRpcExchange();
+
+            advancedBus.Publish(exchange, requestMessage.Properties.ReplyTo, false, responseMessage);
+        }
+
+        private IExchange DeclareRpcExchange()
+        {
+            return publishExchangeDeclareStrategy.DeclareExchange(advancedBus, conventions.RpcExchangeNamingConvention(), ExchangeType.Direct);
         }
     }
 }
